@@ -1,25 +1,35 @@
 import React, {useEffect, useRef, useState} from 'react';
 import './App.css';
-import io from "socket.io-client";
+import {useDispatch, useSelector} from "react-redux";
+import {AppStateType} from "./store/store";
+import {
+    createConnection,
+    destroyConnection,
+    MessagesType,
+    sendMessage,
+    setClientName,
+    typeMessage, UserType
+} from "./store/chatReducer";
 
-const socket = io('http://localhost:3900/')
 
-//const socket = io('https://fast-brushlands-44568.herokuapp.com/')
 
 function App() {
-    const [messages, setMessages] = useState<Array<any>>([])
+    const dispatch = useDispatch()
+    const messages = useSelector<AppStateType, Array<MessagesType>>(state => state.chat.messages)
+    const typingUsers = useSelector<AppStateType, Array<UserType>>(state => state.chat.typingUsers)
+
+    //const [messages, setMessages] = useState([])
     const [message, setMessage] = useState('')
     const [name, setName] = useState('Alex')
     const [isAutoScrollActive, setIsAutoScrollActive] = useState(true)
     const [lastScrollTop, setLastScrollTop] = useState(0)
 
     useEffect(() => {
-        socket.on('init-messages-published', (messages: any) => {
-            setMessages(messages);
-        })
-        socket.on('new-message-sent', (message: any) => {
-            setMessages((prevMessages) => [...prevMessages, message])
-        })
+        dispatch(createConnection());
+
+        return ()=>{
+            dispatch(destroyConnection());
+        }
     }, [])
 
     useEffect(() => {
@@ -32,6 +42,7 @@ function App() {
 
     return (
         <div className='App'>
+            Моё имя: {name}
             <div>
                 <div
                     style={{
@@ -52,10 +63,18 @@ function App() {
                         }
                         setLastScrollTop(element.scrollTop)
                     }}>
-                    {messages.map(m => {
+                    {messages.map((m: MessagesType) => {
                         return (
                             <div key={m.id}>
                                 <b>{m.user.name}:</b> {m.message}
+                                <hr/>
+                            </div>
+                        )
+                    })}
+                    {typingUsers.map((u: UserType) => {
+                        return (
+                            <div key={u.id}>
+                                <b>{u.name}:</b> ...
                                 <hr/>
                             </div>
                         )
@@ -67,17 +86,23 @@ function App() {
                         setName(e.currentTarget.value)
                     }}/>
                     <button onClick={() => {
-                        socket.emit('client-name-sent', name)
+                        dispatch(setClientName(name))
                         setName('')
                     }}>send Name
                     </button>
                 </div>
                 <div>
-                    <textarea value={message} onChange={(e) => {
+                    <textarea
+                        value={message}
+                        onKeyPress={()=>{
+                            dispatch(typeMessage())
+                        }}
+                        onChange={(e) => {
                         setMessage(e.currentTarget.value)
-                    }}></textarea>
+                    }}
+                    ></textarea>
                     <button onClick={() => {
-                        socket.emit('client-message-sent', message)
+                        dispatch(sendMessage(message))
                         setMessage('')
                     }}>send
                     </button>
