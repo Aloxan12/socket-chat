@@ -1,7 +1,7 @@
 import React, {useEffect, useRef, useState} from 'react';
-import './App.css';
+import style from './App.module.css';
 import {useDispatch, useSelector} from "react-redux";
-import {AppStateType} from "./store/store";
+import {AppStateType} from "../../store/store";
 import {
     createConnection,
     destroyConnection,
@@ -9,7 +9,7 @@ import {
     sendMessage,
     setClientName,
     typeMessage, UserType
-} from "./store/chatReducer";
+} from "../../store/chatReducer";
 
 
 
@@ -41,17 +41,10 @@ function App() {
     const messageAnchorRef = useRef<HTMLDivElement>(null)
 
     return (
-        <div className='App'>
-            Моё имя: {name}
-            <div>
+        <div className={style.App}>
+            <div className={style.chatBlock}>
                 <div
-                    style={{
-                        border: '1px solid',
-                        padding: '20px',
-                        width: '300px',
-                        height: '300px',
-                        overflow: 'scroll'
-                    }}
+                    className={style.chatWrap}
                     onScroll={(e) => {
                         let element = e.currentTarget
                         const maxScrollPosition = element.scrollHeight - element.clientHeight
@@ -81,17 +74,17 @@ function App() {
                     })}
                     <div ref={messageAnchorRef}></div>
                 </div>
-                <div>
+                <div className={style.sendName}>
                     <input value={name} onChange={(e) => {
                         setName(e.currentTarget.value)
                     }}/>
                     <button onClick={() => {
                         dispatch(setClientName(name))
                         setName('')
-                    }}>send Name
+                    }}>Send Name
                     </button>
                 </div>
-                <div>
+                <div className={style.sendMessage}>
                     <textarea
                         value={message}
                         onKeyPress={()=>{
@@ -104,7 +97,7 @@ function App() {
                     <button onClick={() => {
                         dispatch(sendMessage(message))
                         setMessage('')
-                    }}>send
+                    }}>Send message
                     </button>
                 </div>
             </div>

@@ -7,8 +7,8 @@ import {MessagesType, UserType} from "../store/chatReducer";
 export const api = {
     socket: null as null | Socket,
     createConnection() {
-        //this.socket = io('https://fast-brushlands-44568.herokuapp.com/')
-        this.socket = io('http://localhost:3500/')
+        this.socket = io('https://fast-brushlands-44568.herokuapp.com/')
+        //this.socket = io('http://localhost:3500/')
     },
     subscribe(initMessagesHandler: (messages: MessagesType[]) => void,
               newInitMessageHandler: (message: string) => void,
