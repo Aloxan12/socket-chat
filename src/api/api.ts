@@ -26,7 +26,9 @@ export const api = {
         this.socket?.emit('client-name-sent', name)
     },
     sendMessage(message: string){
-        this.socket?.emit('client-message-sent', message)
+        this.socket?.emit('client-message-sent', message, (error: string | null)=>{
+            if(error) alert(error)
+        })
     },
     typeMessage(){
         this.socket?.emit('client-typed')
